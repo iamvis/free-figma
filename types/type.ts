@@ -1,5 +1,6 @@
 import { BaseUserMeta, User } from "@liveblocks/client";
 import { Gradient, Pattern } from "fabric/fabric-impl";
+import { LucideIcon } from "lucide-react";
 
 export enum CursorMode {
   Hidden,
@@ -58,15 +59,24 @@ export type Attributes = {
   stroke: string;
 };
 
+export type AppIcon = string | LucideIcon;
+
 export type ActiveElement = {
   name: string;
   value: string;
-  icon: string;
+  icon: AppIcon;
 } | null;
 
 export interface CustomFabricObject<T extends fabric.Object>
   extends fabric.Object {
   objectId?: string;
+  shapeKind?: "freeform" | "connector";
+  connectorStartId?: string;
+  connectorEndId?: string;
+  connectorStartSide?: "left" | "right" | "top" | "bottom";
+  connectorEndSide?: "left" | "right" | "top" | "bottom";
+  connectorPoints?: Array<{ x: number; y: number }>;
+  isConnector?: boolean;
 }
 
 export type ModifyShape = {
@@ -97,6 +107,15 @@ export type RightSidebarProps = {
   activeObjectRef: React.RefObject<fabric.Object | null>;
   isEditingRef: React.MutableRefObject<boolean>;
   syncShapeInStorage: (obj: any) => void;
+  selectedCount: number;
+  isLocked: boolean;
+  onDuplicate: () => void;
+  onBringToFront: () => void;
+  onSendToBack: () => void;
+  onToggleLock: () => void;
+  onClearSelection: () => void;
+  onDistributeHorizontally: () => void;
+  onDistributeVertically: () => void;
 };
 
 export type NavbarProps = {
@@ -109,13 +128,20 @@ export type NavbarProps = {
 export type ShapesMenuProps = {
   item: {
     name: string;
-    icon: string;
+    icon: AppIcon;
     value: Array<ActiveElement>;
   };
   activeElement: any;
   handleActiveElement: any;
   handleImageUpload: any;
   imageInputRef: any;
+};
+
+export type TemplateOption = {
+  name: string;
+  description: string;
+  value: "brainstorm" | "flowchart" | "wireframe" | "journey" | "retro";
+  icon: AppIcon;
 };
 
 

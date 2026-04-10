@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
 import { twMerge } from "tailwind-merge";
 import { type ClassValue, clsx } from "clsx";
+import { ArrowRight, Circle, Image as ImageIcon, PencilLine, Slash, Square, StickyNote, Triangle } from "lucide-react";
 
 const adjectives = [
   "Happy",
@@ -46,30 +47,62 @@ export function generateRandomName(): string {
   return `${randomAdjective} ${randomAnimal}`;
 }
 
-export const getShapeInfo = (shapeType: string) => {
+export const getShapeInfo = (
+  shape:
+    | string
+    | {
+        type?: string;
+        shapeKind?: string;
+        isConnector?: boolean;
+      }
+) => {
+  const shapeType = typeof shape === "string" ? shape : shape.type || "";
+  const shapeKind = typeof shape === "string" ? "" : shape.shapeKind || "";
+  const isConnector = typeof shape === "string" ? false : Boolean(shape.isConnector);
+
+  if (isConnector || shapeKind === "connector") {
+    return {
+      icon: ArrowRight,
+      name: "Connector",
+    };
+  }
+
+  if (shapeKind === "freeform") {
+    return {
+      icon: PencilLine,
+      name: "Free Drawing",
+    };
+  }
+
   switch (shapeType) {
     case "rect":
       return {
-        icon: "/assets/rectangle.svg",
+        icon: Square,
         name: "Rectangle",
       };
 
     case "circle":
       return {
-        icon: "/assets/circle.svg",
+        icon: Circle,
         name: "Circle",
       };
 
     case "triangle":
       return {
-        icon: "/assets/triangle.svg",
+        icon: Triangle,
         name: "Triangle",
       };
 
     case "line":
       return {
-        icon: "/assets/line.svg",
+        icon: Slash,
         name: "Line",
+      };
+
+    case "connector":
+      return {
+        icon: ArrowRight,
+        name: "Connector",
       };
 
     case "i-text":
@@ -80,42 +113,99 @@ export const getShapeInfo = (shapeType: string) => {
 
     case "image":
       return {
-        icon: "/assets/image.svg",
+        icon: ImageIcon,
         name: "Image",
       };
 
-    case "freeform":
+    case "textbox":
       return {
-        icon: "/assets/freeform.svg",
+        icon: StickyNote,
+        name: "Sticky Note",
+      };
+
+    case "freeform":
+    case "path":
+      return {
+        icon: PencilLine,
         name: "Free Drawing",
       };
 
     default:
       return {
-        icon: "/assets/rectangle.svg",
+        icon: Square,
         name: shapeType,
       };
   }
 };
 
-export const exportToPdf = () => {
-  const canvas = document.querySelector("canvas");
+const downloadDataUrl = (dataUrl: string, filename: string) => {
+  const link = document.createElement("a");
+  link.href = dataUrl;
+  link.download = filename;
+  link.click();
+};
 
-  if (!canvas) return;
+const getCanvasExportData = (fabricCanvas: fabric.Canvas | null) => {
+  if (!fabricCanvas) return null;
+
+  return {
+    width: fabricCanvas.getWidth(),
+    height: fabricCanvas.getHeight(),
+    dataUrl: fabricCanvas.toDataURL({
+      format: "png",
+      quality: 1,
+      multiplier: 2,
+      enableRetinaScaling: true,
+    }),
+  };
+};
+
+export const copyTextToClipboard = async (value: string) => {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(value);
+      return true;
+    }
+  } catch {}
+
+  try {
+    const textarea = document.createElement("textarea");
+    textarea.value = value;
+    textarea.setAttribute("readonly", "true");
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.appendChild(textarea);
+    textarea.select();
+    const copied = document.execCommand("copy");
+    document.body.removeChild(textarea);
+    return copied;
+  } catch {
+    return false;
+  }
+};
+
+export const exportToPdf = (fabricCanvas: fabric.Canvas | null) => {
+  const canvasData = getCanvasExportData(fabricCanvas);
+
+  if (!canvasData) return;
 
   // use jspdf
   const doc = new jsPDF({
-    orientation: "landscape",
+    orientation: canvasData.width >= canvasData.height ? "landscape" : "portrait",
     unit: "px",
-    format: [canvas.width, canvas.height],
+    format: [canvasData.width, canvasData.height],
   });
 
-  // get the canvas data url
-  const data = canvas.toDataURL();
-
   // add the image to the pdf
-  doc.addImage(data, "PNG", 0, 0, canvas.width, canvas.height);
+  doc.addImage(canvasData.dataUrl, "PNG", 0, 0, canvasData.width, canvasData.height);
 
   // download the pdf
   doc.save("canvas.pdf");
+};
+
+export const exportToPng = (fabricCanvas: fabric.Canvas | null) => {
+  const canvasData = getCanvasExportData(fabricCanvas);
+  if (!canvasData) return;
+
+  downloadDataUrl(canvasData.dataUrl, "board.png");
 };

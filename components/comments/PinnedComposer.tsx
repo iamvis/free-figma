@@ -1,18 +1,27 @@
 "use client";
 
 import Image from "next/image";
+import { useMemo } from "react";
 import { Composer, ComposerProps } from "@liveblocks/react-comments";
+import { useAppShell } from "../providers/AppShellProvider";
 
 type Props = {
   onComposerSubmit: ComposerProps["onComposerSubmit"];
 };
 
 const PinnedComposer = ({ onComposerSubmit, ...props }: Props) => {
+  const { session } = useAppShell();
+  const avatarIndex = useMemo(() => {
+    const seed = `${session?.displayName || "guest"}:${session?.roomCode || "room"}`;
+    const hash = Array.from(seed).reduce((total, char) => total + char.charCodeAt(0), 0);
+    return (hash % 30) + 1;
+  }, [session?.displayName, session?.roomCode]);
+
   return (
     <div className="absolute flex gap-4" {...props}>
       <div className="select-none relative w-9 h-9 shadow rounded-tl-md rounded-tr-full rounded-br-full rounded-bl-full bg-white flex justify-center items-center">
         <Image
-          src={`https://liveblocks.io/avatars/avatar-${Math.floor(Math.random() * 30)}.png`}
+          src={`https://liveblocks.io/avatars/avatar-${avatarIndex}.png`}
           alt="someone"
           width={28}
           height={28}

@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
+    "check": "npm run lint && npm run typecheck && npm run build"
   },
   "dependencies": {
     "@liveblocks/client": "^1.12.0",
@@ -19,9 +21,9 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "fabric": "^5.3.0",
-    "jspdf": "^2.5.1",
+    "jspdf": "4.2.1",
     "lucide-react": "^0.377.0",
-    "next": "14.2.3",
+    "next": "14.2.35",
     "react": "^18",
     "react-dom": "^18",
     "tailwind-merge": "^2.3.0",
@@ -35,9 +37,18 @@
     "@types/react-dom": "^18",
     "@types/uuid": "^9.0.8",
     "eslint": "^8",
-    "eslint-config-next": "14.2.3",
+    "eslint-config-next": "14.2.35",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
+  },
+  "overrides": {
+    "@tootallnate/once": "3.0.1",
+    "@mapbox/node-pre-gyp": "2.0.3",
+    "glob": "10.5.0",
+    "tar": "7.5.13",
+    "minimatch@3.1.5": {
+      "brace-expansion": "1.1.13"
+    }
   }
 }

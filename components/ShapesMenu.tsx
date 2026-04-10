@@ -1,11 +1,10 @@
 "use client";
 
-import Image from "next/image";
-
 import { ShapesMenuProps } from "@/types/type";
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
+import IconRenderer from "./IconRenderer";
 
 const ShapesMenu = ({
   item,
@@ -20,17 +19,22 @@ const ShapesMenu = ({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild className="no-ring">
-          <Button className="relative h-5 w-5 object-contain" onClick={() => handleActiveElement(item)}>
-            <Image
-              src={isDropdownElem ? activeElement.icon : item.icon}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-11 w-11 rounded-md bg-transparent p-0 text-inherit hover:bg-transparent"
+            onClick={() => handleActiveElement(item)}
+          >
+            <IconRenderer
+              icon={isDropdownElem ? activeElement.icon : item.icon}
               alt={item.name}
-              fill
+              size={20}
               className={isDropdownElem ? "invert" : ""}
             />
           </Button>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent className="mt-5 flex flex-col gap-y-1 border-none bg-primary-black py-4 text-white">
+        <DropdownMenuContent className="mt-5 flex flex-col gap-y-1 rounded-2xl border border-primary-grey-100 bg-primary-black/95 p-3 text-[rgb(var(--app-text))] shadow-2xl">
           {item.value.map((elem) => (
             <Button
               key={elem?.name}
@@ -42,16 +46,15 @@ const ShapesMenu = ({
               }`}
             >
               <div className="group flex items-center gap-2">
-                <Image
-                  src={elem?.icon as string}
+                <IconRenderer
+                  icon={elem?.icon}
                   alt={elem?.name as string}
-                  width={20}
-                  height={20}
+                  size={20}
                   className={activeElement.value === elem?.value ? "invert" : ""}
                 />
                 <p
                   className={`text-sm  ${
-                    activeElement.value === elem?.value ? "text-primary-black" : "text-white"
+                    activeElement.value === elem?.value ? "text-slate-950" : "text-[rgb(var(--app-text))]"
                   }`}
                 >
                   {elem?.name}

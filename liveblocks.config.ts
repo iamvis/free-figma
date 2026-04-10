@@ -1,9 +1,16 @@
 import { LiveMap, createClient } from "@liveblocks/client";
 import { createRoomContext, createLiveblocksContext } from "@liveblocks/react";
-  import { ReactionEvent } from "./types/type";
+import { ReactionEvent } from "./types/type";
+
+const LIVEBLOCKS_PUBLIC_KEY = process.env.NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY;
+
+if (!LIVEBLOCKS_PUBLIC_KEY) {
+  throw new Error("Missing NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY. Add it to your environment before starting FigPro.");
+}
+
 const client = createClient({
   throttle: 16,
-  publicApiKey: process.env.NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY! ,
+  publicApiKey: LIVEBLOCKS_PUBLIC_KEY,
  
   async resolveUsers({ userIds }) {
    
@@ -25,7 +32,9 @@ const client = createClient({
 // `user.presence` property. Must be JSON-serializable.
 export type Presence = {
   cursor: { x: number, y: number } | null,
-  message:string | null
+  message:string | null,
+  userName: string | null,
+  userColor: string | null
 };
 
 // Optionally, Storage represents the shared document that persists in the

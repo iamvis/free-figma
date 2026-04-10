@@ -20,12 +20,12 @@ const config = {
     extend: {
       colors: {
         primary: {
-          black: "#14181F",
-          green: "#56FFA6",
+          black: "rgb(var(--primary-black) / <alpha-value>)",
+          green: "rgb(var(--primary-green) / <alpha-value>)",
           grey: {
-            100: "#2B303B",
-            200: "#202731",
-            300: "#C4D3ED",
+            100: "rgb(var(--primary-grey-100) / <alpha-value>)",
+            200: "rgb(var(--primary-grey-200) / <alpha-value>)",
+            300: "rgb(var(--primary-grey-300) / <alpha-value>)",
           },
         },
       },

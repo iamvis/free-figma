@@ -3,6 +3,7 @@ import Dimensions from './settings/Dimensions'
 import Text from './settings/Text'
 import Color from './settings/Color'
 import Export from './settings/Export'
+import QuickActions from './settings/QuickActions'
 import { RightSidebarProps } from '@/types/type'
 import { modifyShape } from '@/lib/shapes'
 import { useRedo } from '@/liveblocks.config'
@@ -14,6 +15,15 @@ const RightSidebar = ({
   activeObjectRef,
   isEditingRef,
   syncShapeInStorage,
+  selectedCount,
+  isLocked,
+  onDuplicate,
+  onBringToFront,
+  onSendToBack,
+  onToggleLock,
+  onClearSelection,
+  onDistributeHorizontally,
+  onDistributeVertically,
 }:RightSidebarProps) => {
   const colorInputRef= useRef(null);
   const strokInputRef= useRef(null)
@@ -34,16 +44,13 @@ const RightSidebar = ({
    }
 
   return (
-    <section className="flex flex-col border-t
-    border-primary-grey-200 bg-primary-black
-    text-primary-grey-300 min-2-[227px] sticky right-0
-    h-full max-sm:hidden select-none"><h3
-     className=" px-5 pt-4 text-xs uppercase"
-    >Design</h3>
-    <span className="text-xs text-primary-grey-300
-    mt-3 px-5 border-b border-primary-grey-200 pb-4">
-      Develop Your Own
-    </span>
+    <section className="panel-shell soft-glow flex h-full min-w-[260px] flex-col overflow-y-auto text-primary-grey-300 max-sm:hidden select-none">
+    <div className="panel-section space-y-2">
+      <h3 className="type-kicker">Design</h3>
+      <span className="type-body block">
+        Fine-tune size, typography, color, and export options for the selected element.
+      </span>
+    </div>
     <Dimensions
     width={elementAttributes.width}
     height={elementAttributes.height}
@@ -55,6 +62,17 @@ const RightSidebar = ({
      fontSize={elementAttributes.fontSize}
      fontWeight={elementAttributes.fontWeight}
      handleInputChange={handleInputChange}
+    />
+    <QuickActions
+      selectedCount={selectedCount}
+      isLocked={isLocked}
+      onDuplicate={onDuplicate}
+      onBringToFront={onBringToFront}
+      onSendToBack={onSendToBack}
+      onToggleLock={onToggleLock}
+      onClearSelection={onClearSelection}
+      onDistributeHorizontally={onDistributeHorizontally}
+      onDistributeVertically={onDistributeVertically}
     />
     <Color
     inputRef={colorInputRef}
@@ -70,7 +88,7 @@ const RightSidebar = ({
     placeholder="stroke"
     handleInputChange={handleInputChange}
     />
-    <Export/>
+    <Export fabricCanvas={fabricRef.current} />
     </section>
   )
 }

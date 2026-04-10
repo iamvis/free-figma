@@ -24,6 +24,15 @@ type Props = {
   children: ReactNode;
 };
 
+type EventWithSavedPath = Event & { _savedComposedPath?: EventTarget[] };
+
+const getComposedPath = (event: EventWithSavedPath) => {
+  if (!event._savedComposedPath) {
+    event._savedComposedPath = event.composedPath();
+  }
+  return event._savedComposedPath;
+};
+
 export const NewThread = ({ children }: Props) => {
   // set state to track if we're placing a new comment or not
   const [creatingCommentState, setCreatingCommentState] = useState<
@@ -64,11 +73,11 @@ export const NewThread = ({ children }: Props) => {
       // If already placed, click outside to close composer
       if (creatingCommentState === "placed") {
         // check if the click event is on/inside the composer
-        const isClickOnComposer = ((e as any)._savedComposedPath = e
-          .composedPath()
-          .some((el: any) => {
-            return el.classList?.contains("lb-composer-editor-actions");
-          }));
+        const isClickOnComposer = getComposedPath(e as EventWithSavedPath).some(
+          (target) =>
+            target instanceof HTMLElement &&
+            target.classList.contains("lb-composer-editor-actions")
+        );
 
         // if click is inisde/on composer, don't do anything
         if (isClickOnComposer) {
@@ -100,8 +109,7 @@ export const NewThread = ({ children }: Props) => {
   useEffect(() => {
     // If dragging composer, update position
     const handlePointerMove = (e: PointerEvent) => {
-      // Prevents issue with composedPath getting removed
-      (e as any)._savedComposedPath = e.composedPath();
+      getComposedPath(e as EventWithSavedPath);
       lastPointerEvent.current = e;
     };
 
@@ -127,8 +135,7 @@ export const NewThread = ({ children }: Props) => {
         return;
       }
 
-      // Prevents issue with composedPath getting removed
-      (e as any)._savedComposedPath = e.composedPath();
+      getComposedPath(e as EventWithSavedPath);
       lastPointerEvent.current = e;
       setAllowUseComposer(true);
     };
